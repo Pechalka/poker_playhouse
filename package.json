@@ -4,6 +4,7 @@
   "description": "",
   "main": "server/index.js",
   "scripts": {
+    "build:frontend": "webpack",
     "start": "node ./server/index",
     "test-poker": "mocha ./server/poker/__test__/*.js",
     "test-models": "mocha ./server/db/models/__test__/*.js"
@@ -38,6 +39,7 @@
     "path": "^0.12.7",
     "pg": "8.7.3",
     "pg-hstore": "2.3.2",
+    "pm2": "^5.2.0",
     "pokersolver": "^2.1.2",
     "random-id": "0.0.2",
     "react": "^15.4.2",
