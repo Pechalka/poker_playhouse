@@ -177,6 +177,11 @@ module.exports = {
     async function saveHandHistory(table) {
       const seats = Object.keys(table.seats).map(seatId => table.seats[seatId])
       const players = seats.filter(seat => seat != null).map(seat => seat.player)
+      const result = table.determineWinner(table.pot, Object.values(seats).slice())
+      await db.Statistics.create({
+        user_id: "",
+        points: 0,
+      })
 
       const hand = await db.Hand.create({
         history: JSON.stringify(table.history),
