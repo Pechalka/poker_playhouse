@@ -1,6 +1,6 @@
 module.exports = function (sequelize, DataTypes) {
     const Statistics = sequelize.define('Statistics', {
-      user_id: {
+      account_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
@@ -15,7 +15,7 @@ module.exports = function (sequelize, DataTypes) {
     });
   
     Statistics.associate = models => {
-        Statistics.belongsTo(models.User, { foreignKey: 'user_id' });
+        Statistics.belongsTo(models.Account, { foreignKey: 'account_id' });
     };
   
     return Statistics;

@@ -106,7 +106,6 @@ class Lobby extends React.Component<Props, State> {
       socket, user, receiveLobbyInfo, tablesUpdated, playersUpdated,
       tableJoined, tableLeft, tableUpdated
     } = this.props
-
     if (user) {
       socket.emit('fetch_lobby_info', user)
     }
@@ -146,7 +145,8 @@ class Lobby extends React.Component<Props, State> {
 
   handleTableClick = tableId => {
     if (Object.keys(this.props.openTables).length < 4) {
-      this.props.socket.emit('join_table', tableId)
+      console.log('------',this.props)
+      this.props.socket.emit('join_table', {tableId,accountId:this.props.account ? this.props.account.id : null})
     }
     this.setState({ onMenu: false })
   }

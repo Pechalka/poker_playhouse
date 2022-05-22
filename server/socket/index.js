@@ -26,9 +26,16 @@ module.exports = {
       socket.broadcast.emit('players_updated', players)
     })
 
-    socket.on('join_table', tableId => {
+    socket.on('join_table', ({tableId,accountId}) => {
+      //TODO check what type of table PvP/Free/PlayToEarn
+      /**
+       * handle join_table
+       * because only input where can check it
+       */
+      if(accountId){
+        players[socket.id].accountId = accountId
+      }
       tables[tableId].addPlayer(players[socket.id])
-
       socket.broadcast.emit('tables_updated', tables)
       socket.emit('table_joined', { tables, tableId })
     })
@@ -174,15 +181,31 @@ module.exports = {
       io.to(socket.id).emit('players_updated', players)
     }
 
+    async function broadcastRake(table){
+      //get winner id and rake
+      const seatsAndCombination = table.getWinners(Object.keys(table.seats).map(seatId => table.seats[seatId]))
+      for(const index of seatsAndCombination){
+        //get player info by winner seat
+        const seatId = `${index[0]}`
+        const {player}= table.seats[seatId];
+        /**
+         * One handle for all games free/PvP/PlayToEarn
+         * thats why need to check if accountId exist
+         */
+        if(player.accountId){
+          await db.Statistics.create({
+            account_id: player.accountId,
+            points: 100,
+            tokens: 100,
+          })
+        }
+      }
+      return
+    }
+
     async function saveHandHistory(table) {
       const seats = Object.keys(table.seats).map(seatId => table.seats[seatId])
       const players = seats.filter(seat => seat != null).map(seat => seat.player)
-      const result = table.determineWinner(table.pot, Object.values(seats).slice())
-      await db.Statistics.create({
-        user_id: "",
-        points: 0,
-      })
-
       const hand = await db.Hand.create({
         history: JSON.stringify(table.history),
       })
@@ -221,12 +244,13 @@ module.exports = {
     }
 
     function changeTurnAndBroadcast(table, seatId) {
-      setTimeout(() => {
+      setTimeout(async () => {
         table.changeTurn(seatId)
         broadcastToTable(table)
 
         if (table.handOver) {
-          saveHandHistory(table)
+          await saveHandHistory(table)
+          await broadcastRake(table)
           initNewHand(table)
         }
       }, 1000)
