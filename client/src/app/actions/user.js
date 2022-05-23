@@ -172,7 +172,7 @@ export function tokenLogin(token) {
 
         if (user) {
           dispatch(tokenLoginSuccess(user, token))
-          if (window.location.pathname !== '/lobby') {
+          if (window.location.pathname !== '/lobby' && window.location.pathname !== '/leaderboard') {
             history.replace('/lobby')
           }
           // if (hashHistory.getCurrentLocation().pathname !== '/lobby') {

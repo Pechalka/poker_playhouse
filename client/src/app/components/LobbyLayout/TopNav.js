@@ -24,6 +24,7 @@ const TopNav = () => (
       <Link to="/lobby/hand-history" style={linkStyle}>Hand history</Link>
       <Link to="/lobby/groups" style={linkStyle}>Groups</Link>
       <Link to="/lobby/accounts" style={linkStyle}>Accounts</Link>
+      <Link to="/leaderboard" style={linkStyle}>leaderboard</Link>
     </div>
   </div>
 )

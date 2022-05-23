@@ -1,7 +1,8 @@
-import React from 'react';
-
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from "react-router-dom";
 // import * as api from '../api'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
 const nickNames = ['dima', 'urban', 'guest', 'datuk'];
 
@@ -63,52 +64,46 @@ const periods = [
   },
 ]
 
-class Leaderboard extends React.Component {
-	constructor(props) {
-	    super(props)
+const Leaderboard = () => {
 
-	    this.state = {
-	      isLoading: false,
-	      data: [],
-	      total: 0,
-	      period: 'day',
-	    }
-  	}
+ 		const handlyLoadMore = () => {
 
-  	componentDidMount() {
-  		this.setState({
-  			isLoading: true
-  		})
-  		api.getLeaderboard().then(users => {
-  			this.setState({
-  				data: users,
-  				isLoading: false
-  			})
-  		})
-  	}
+ 		}
 
-  	handlySelectPeriod = (period) => {
-  		this.setState({
-  			period,
-  		})
-  	} 
+  	let navigate = useNavigate();
 
-  	handlySearch = () => {
+ 		const [data, setData] = useState([])
+ 		const [isLoading, setIsLoading] = useState(false)
+ 		const [period, setPeriod] = useState('day')
+ 		const [total, setTotal] = useState(0)
+ 		const searchInput = useRef(null);
 
-  	}
+ 		useEffect(() => {
+ 			setIsLoading(true)
+ 			api.getLeaderboard().then(users => {
+ 				setIsLoading(false)
+ 				setData(users);
+ 				setTotal(0)
+ 			})
+ 		}, [])
 
-  	handlyLoadMore = () => {
+ 		const handlySearch = (e) => {
+ 			e.preventDefault();
+ 			console.log('searchInput ', searchInput.current.value)
+ 		}
 
-  	}
+ 		const accounts = useSelector((state) => {
+ 			return state.user.user ? state.user.user.accounts.map(a => a.id) : []
+ 		});
 
-	render() {
+ 		const handleEnter = () => {
+ 			if (accounts.length > 0) {
+	 			navigate('/lobby')
+ 			} else {
+	 			navigate('/login')
+ 			}
+ 		}
 
-		const {
-			isLoading,
-			data,
-			total,
-			period,
-		} = this.state;
 
 		const periodComponent = (
 	        <div className="period">
@@ -116,7 +111,7 @@ class Leaderboard extends React.Component {
 	            <div
 	              key={item.key}
 	              className={`period__item ${period === item.key ? 'period__item--active' : ''}`}
-	              onClick={() => this.handlySelectPeriod(item.key)}
+	              onClick={() => setPeriod(item.key)}
 	            >{item.text}</div>
 	          ))}
 	        </div>
@@ -124,19 +119,19 @@ class Leaderboard extends React.Component {
 
 		  return (
 		    <div className="leaderboard-container">
-		      {/*<div className="user">
+		      <div className="user">
 		        <h3 className="user__title">Узнай где ты</h3>
 		        <p className="user__text">Войти через криптокощелек</p>
-		        <button>Войти</button>
-		      </div>*/}
+		        <button onClick={handleEnter}>Войти</button>
+		      </div>
 		      <div className="leaderboard">
 		        <p className="timer">Обновление через<b>15</b>h<b>54</b>m</p>
 		        <h1 className="lheader">Таблица лидеров</h1>
 		        <div className="user-search">
 		          {isLoading && <span className="user-search__text">ищем игроков...</span>}
 		        </div>
-		        <form className="search-form" onSubmit={this.handlySearch}>
-		          <input ref={ref => this.searchInput = ref} className="search-form__input" placeholder='Поиск по игрокам'/>
+		        <form className="search-form" onSubmit={handlySearch}>
+		          <input ref={searchInput} className="search-form__input" placeholder='Поиск по игрокам'/>
 		          <button className="search-form__button">Найти</button>
 		        </form>
 		        {periodComponent}
@@ -151,9 +146,9 @@ class Leaderboard extends React.Component {
 		              </tr>
 		            </thead>
 		            <tbody>
-		              {data.map(item => (
-		                <tr key={item.nickname}>
-		                  <td>{item.position}</td>
+		              {data.map((item, index) => (
+		                <tr key={item.nickname} className={accounts.includes(item.id) ? 'leader-table--selected' : ''}>
+		                  <td>{index + 1}</td>
 		                  <td>{item.nickname}</td>
 		                  <td>{item.winCount}</td>
 		                  <td>{item.score}</td>
@@ -162,14 +157,13 @@ class Leaderboard extends React.Component {
 		            </tbody>
 		          </table>
 		          {!isLoading && total > data.length && <div className="laod-more">
-		            <button onClick={this.handlyLoadMore} className="laod-more__button">Загрузить еще</button>
+		            <button onClick={handlyLoadMore} className="laod-more__button">Загрузить еще</button>
 		          </div>}
 		        </div>
 		      </div>
 		    </div>
 		  )
 	}
-}
 
 //   const [data, setLeaderboard] = useState([]);
 //   const [isLoading, setIsLoading] = useState(true);
