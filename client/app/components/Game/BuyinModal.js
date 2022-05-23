@@ -66,7 +66,7 @@ class BuyinModal extends React.Component<Props, State> {
     const amount = parseFloat(this.buyinAmount.value)
     const minBuy = table.limit / 2
     const maxBuy = table.limit
-
+    const accountId = localStorage.getItem('account')?.id;
     if (amount < minBuy || amount > maxBuy) {
       this.setState({ errorMessage: `Please enter an amount between ${minBuy} and ${maxBuy}` })
       return 
@@ -76,7 +76,7 @@ class BuyinModal extends React.Component<Props, State> {
     if (alreadySeated) {
       this.props.handleRebuy(tableId, seatId, amount)
     } else {
-      this.props.buyInAndSitDown(tableId, seatId, amount)
+      this.props.buyInAndSitDown(tableId, seatId, amount, accountId)
     }
 
     this.props.closeModal()

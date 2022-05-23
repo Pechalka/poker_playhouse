@@ -1,5 +1,7 @@
 module.exports = function(sequelize, DataTypes) {
-  const UserHand = sequelize.define('UserHand', {
+  const TABLE_NAME = "user_hand";
+
+  const UserHand = sequelize.define(TABLE_NAME, {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -11,7 +13,7 @@ module.exports = function(sequelize, DataTypes) {
     hand_id: {
       type: DataTypes.INTEGER,
     },
-  });
+  }, { underscored: true });
 
   UserHand.associate = models => {
     UserHand.belongsTo(models.User, { foreignKey: 'user_id' })

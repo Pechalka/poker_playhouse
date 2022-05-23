@@ -2,7 +2,8 @@
 Realtime multiplayer poker  
 Node.js, React, Redux, Socket.IO, Express, Sequelize, PostgreSQL
 
-
+configure# 
+server->db->config->config.json file at first
 
 JWT_SECRET=test PORT=8000 NODE_ENV=development yarn start
 

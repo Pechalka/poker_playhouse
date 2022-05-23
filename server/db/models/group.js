@@ -1,5 +1,7 @@
+const TABLE_NAME = "group";
+
 module.exports = function (sequelize, DataTypes) {
-  const Group = sequelize.define('Group', {
+  const Group = sequelize.define(TABLE_NAME, {
     creator_id: {
       type: DataTypes.INTEGER,
     },
@@ -11,7 +13,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
-  });
+  }, { underscored: true });
 
   Group.associate = models => {
     Group.hasMany(models.GroupMember, { foreignKey: 'group_id' });

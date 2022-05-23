@@ -168,8 +168,8 @@ class Lobby extends React.Component<Props, State> {
     this.setState({ modalOpen: false, tableId: null, seatId: null })
   }
 
-  buyInAndSitDown = (tableId, seatId, amount) => {
-    this.props.socket.emit('sit_down', { tableId, seatId, amount })
+  buyInAndSitDown = (tableId, seatId, amount,  accountId) => {
+    this.props.socket.emit('sit_down', { tableId, seatId, amount, accountId })
   }
 
   handleRebuy = (tableId, seatId, amount) => {

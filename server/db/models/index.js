@@ -23,12 +23,15 @@ fs
     const model = require( path.join(__dirname, file))(sequelize, Sequelize.DataTypes); 
 
     // console.log('model ', model.findOne)
+    console.log('model ', model.name);
 
     db[model.name] = model;
   });
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
+    // console.log(modelName);
+
     db[modelName].associate(db);
   }
 });

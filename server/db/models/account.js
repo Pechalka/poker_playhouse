@@ -1,23 +1,26 @@
 module.exports = function (sequelize, DataTypes) {
-  const Account = sequelize.define('Account', {
+  const TABLE_NAME = "account";
+
+  const Account = sequelize.define(TABLE_NAME, {
     name: {
       type: DataTypes.STRING,
       allowNull: false
     },
-	level: {
+    level: {
       type: DataTypes.INTEGER,
     },
     tokens: {
       type: DataTypes.INTEGER,
     },
-	experience: {
+    experience: {
       type: DataTypes.INTEGER,
     },
-  });
+  }, { underscored: false });
 
-  Account.associate = models => {
-  	Account.belongsTo(models.User, { foreignKey: 'user_id' })
-  };;
+  // Account.associate = (models) => {
+    Account.belongsTo(sequelize.models.User, { foreignKey: 'user_id' });
+    Account.hasMany(sequelize.models.AccountStatistic, { foreignKey: 'user_id' })
+  // };
 
   return Account;
 };

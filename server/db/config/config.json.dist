@@ -1,0 +1,16 @@
+{
+  "development": {
+    "database": "total-poker",
+    "username": "user",
+    "password": "1",
+    "dialect": "postgres",
+    "port": "5806"
+  },
+  "production": {
+    "database": "total-poker",
+    "username": "user",
+    "password": "1",
+    "dialect": "postgres",
+    "port": "5888"
+  }
+}

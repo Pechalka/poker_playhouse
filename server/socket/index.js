@@ -86,11 +86,11 @@ module.exports = {
       broadcastToTable(table, message, from)
     })
 
-    socket.on('sit_down', ({ tableId, seatId, amount }) => {
+    socket.on('sit_down', ({ tableId, seatId, amount, accountId }) => {
       const table = tables[tableId]
-      const player = players[socket.id]
+      const player = Object.assign(players[socket.id], { accountId: accountId ? accountId : null });
 
-      table.sitPlayer(player, seatId, amount)
+      table.sitPlayer(player, seatId, amount, accountId)
       let message = `${player.name} sat down in Seat ${seatId}`
 
       updatePlayerBankroll(player, -(amount))
