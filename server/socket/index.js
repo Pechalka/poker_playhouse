@@ -182,25 +182,36 @@ module.exports = {
     }
 
     async function broadcastRake(table){
-      //get winner id and rake
-      const seatsAndCombination = table.getWinners(Object.keys(table.seats).map(seatId => table.seats[seatId]))
-      for(const index of seatsAndCombination){
-        //get player info by winner seat
-        const seatId = `${index[0]}`;
-        const {player}= table.seats[seatId];
-        /**
+       /**
          * One handle for all games free/PvP/PlayToEarn
          * thats why need to check if accountId exist
          */
-        if(player.accountId){
-          await db.Statistics.create({
-            account_id: player.accountId,
-            points: 100,
-            tokens: 100,
-          })
+        if(table.type === "playToEarn" ){
+          //get winner id and rake
+          const seatsAndCombination = table.getWinners(Object.keys(table.seats).map(seatId => table.seats[seatId]))
+          const statistics = Object.keys(table.seats).reduce((acc,seatIndex)=>{
+            const seat = table.seats[seatIndex];
+            if(seat){
+              const isWinner = seatsAndCombination.some(combination => combination[0] == seatIndex);
+              const statistic = {
+                account_id:seat.player.accountId
+              };
+              if(isWinner){
+  
+                acc.push(Object.assign(statistic, {points: 200,
+                  tokens: 200}))
+              }else{
+                acc.push(Object.assign(statistic, {points: 100,
+                  tokens: 100}))
+              }
+            }
+            return acc;
+          },[]);
+          if(statistics.length){
+            await db.Statistics.bulkCreate(statistics)
+          }
         }
-      }
-      return
+        return
     }
 
     async function saveHandHistory(table) {
