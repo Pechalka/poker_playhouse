@@ -44,6 +44,7 @@ type Props = {
     bankroll: number,
   },
   account: string,
+  accountId: string, 
   tables: {
     [key: number]: {
       table: {
@@ -145,8 +146,7 @@ class Lobby extends React.Component<Props, State> {
 
   handleTableClick = tableId => {
     if (Object.keys(this.props.openTables).length < 4) {
-      console.log('------',this.props)
-      this.props.socket.emit('join_table', {tableId,accountId:this.props.account ? this.props.account.id : null})
+      this.props.socket.emit('join_table', {tableId,accountId:this.props.accountId})
     }
     this.setState({ onMenu: false })
   }
@@ -311,6 +311,7 @@ function mapStateToProps(state) {
   return {
     user: state.user.user,
     account: account,
+    accountId: state.user.accountId,
     tables: state.lobby.tables,
     players: state.lobby.players,
     openTables: state.lobby.openTables,

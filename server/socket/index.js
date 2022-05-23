@@ -186,7 +186,7 @@ module.exports = {
       const seatsAndCombination = table.getWinners(Object.keys(table.seats).map(seatId => table.seats[seatId]))
       for(const index of seatsAndCombination){
         //get player info by winner seat
-        const seatId = `${index[0]}`
+        const seatId = `${index[0]}`;
         const {player}= table.seats[seatId];
         /**
          * One handle for all games free/PvP/PlayToEarn
