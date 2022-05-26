@@ -8,8 +8,13 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceRoot}\\index.js",
-      "cwd": "${workspaceRoot}"
+      "program": "${workspaceRoot}/server/index.js",
+      "cwd": "${workspaceRoot}",
+      "env":{
+        "NODE_ENV": "development",
+        "PORT": "8643",
+        "JWT_SECRET": "secret"
+      }
     },
     {
       "type": "node",

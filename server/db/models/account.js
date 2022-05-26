@@ -4,19 +4,20 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
-	level: {
+	  level: {
       type: DataTypes.INTEGER,
     },
     tokens: {
       type: DataTypes.INTEGER,
     },
-	experience: {
+	  experience: {
       type: DataTypes.INTEGER,
     },
   });
 
   Account.associate = models => {
   	Account.belongsTo(models.User, { foreignKey: 'user_id' })
+    Account.hasMany(models.Statistics, { foreignKey: 'account_id' });
   };;
 
   return Account;

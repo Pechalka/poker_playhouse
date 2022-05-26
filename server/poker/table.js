@@ -421,7 +421,8 @@ class Table {
     this.wentToShowdown = true
     this.endHand()
   }
-  determineWinner(amount, seats) {
+
+  getWinners(seats){
     const participants = seats.filter(seat => seat && !seat.folded).map(seat => {
       const cards = seat.hand.slice().concat(this.board.slice())
       const solverCards = this.mapCardsForPokerSolver(cards)
@@ -443,6 +444,11 @@ class Table {
       const seatId = findHandOwner(winningCards)
       return [seatId, winner.descr]
     })
+    return winners
+  }
+  
+  determineWinner(amount, seats) {
+    const winners = this.getWinners(seats)
 
     for (let i = 0; i < winners.length; i++) {
       const seat = this.seats[winners[i][0]]

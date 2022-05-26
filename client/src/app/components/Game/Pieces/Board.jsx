@@ -17,7 +17,6 @@ class Board extends React.Component<Props> {
   render() {
     let renderedCards = this.props.table.board.slice(0)
     let { table } = this.props
-
     while (renderedCards.length < 5) {
       renderedCards.push({
         rank: '0',
