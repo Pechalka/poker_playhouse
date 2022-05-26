@@ -38,6 +38,7 @@ module.exports = {
       }, [])
 
       results = results.map((item) => ({
+        id: item.id,
         position: item.experience,
         nickname: item.name,
         winCount: '???',
