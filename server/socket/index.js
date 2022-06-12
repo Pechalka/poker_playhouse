@@ -35,6 +35,7 @@ module.exports = {
       if(accountId){
         players[socket.id].accountId = accountId
       }
+
       tables[tableId].addPlayer(players[socket.id])
       socket.broadcast.emit('tables_updated', tables)
       socket.emit('table_joined', { tables, tableId })

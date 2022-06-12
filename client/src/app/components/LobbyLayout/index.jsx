@@ -379,6 +379,7 @@ const Lobby = (props) => {
     messages,
     // logout,
     account,
+    accountId,
   } = props      
 
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -396,7 +397,8 @@ const Lobby = (props) => {
 
   const handleTableClick = tableId => {
     if (Object.keys(props.openTables).length < 4) {
-      socket.emit('join_table', tableId)
+
+      socket.emit('join_table', { tableId, accountId  })
     }
     setOnMenu(false);
     // this.setState({ onMenu: false })
@@ -560,6 +562,7 @@ function mapStateToProps(state) {
   const account = state.user && state.user.user && state.user.user.accounts ? state.user.user.accounts.find(a => a.id === state.user.accountId) : null;
 
   return {
+    accountId: state.user.accountId,
     user: state.user.user,
     account: account,
     tables: state.lobby.tables,
