@@ -11,6 +11,11 @@ module.exports = function (sequelize, DataTypes) {
       tokens: {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      win:{
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       }
     });
   

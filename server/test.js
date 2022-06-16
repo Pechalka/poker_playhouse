@@ -2,20 +2,13 @@ const db = require('./db/models')
 const {col, fn} = require('sequelize')
 
 async function run(){
-    return await db.User.findAll({
-        attributes:[[col('User.username'), 'nickname'], [fn("sum",col('Accounts.Statistics.tokens')), 'tokens'], [col('Accounts.Statistics.points'), 'points']],
+    return await db.Account.findAll({
+        attributes:["id", "name"],
         include: [{
-            attributes:["id"],
-            model: db.Account,
-            include: [{
-                model:db.Statistics,
-                attributes:["points", "tokens","account_id"]
-            }]
+            model:db.Statistics,
+            attributes:["tokens","account_id",[fn("sum",col('Statistics.tokens')), 'tokens']],
         }],
-        order:[
-            // [col("points"), "ASC"]
-            // [{model: db.Account, as: 'account'}, 'level', 'DESC'],
-        ]
+        group:["Account.id","Statistics.account_id","Account.name","Statistics.tokens"],
     });
 }
 

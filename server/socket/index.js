@@ -199,10 +199,14 @@ module.exports = {
               if(isWinner){
   
                 acc.push(Object.assign(statistic, {points: 200,
-                  tokens: 200}))
+                  tokens: 200,
+                  win:1
+                }))
               }else{
                 acc.push(Object.assign(statistic, {points: 100,
-                  tokens: 100}))
+                  tokens: 100,
+                  win:0
+                }))
               }
             }
             return acc;
