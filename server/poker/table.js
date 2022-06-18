@@ -172,17 +172,27 @@ class Table {
     this.unfoldPlayers()
     this.history = [];
     
+    console.log('qqq1')
     if (this.activePlayers().length > 1) {
+      console.log('qqqqqqq');
       this.button = this.nextActivePlayer(this.button, 1)
+    console.log('qqq2')
       this.setTurn()
+    console.log('qqq3')
       this.dealPreflop()
+    console.log('qqq4')
       // get the preflop stacks
       this.updateHistory()
+    console.log('qqq5')
       this.setBlinds()
+    console.log('qqq6')
       this.handOver = false
     }
+    console.log('qqq7')
 
     this.updateHistory()
+    console.log('qqq8')
+
   }
   unfoldPlayers() {
     for (let i = 1; i <= this.maxPlayers; i++) {

@@ -6,7 +6,7 @@ const Table = require('../poker/table.js')
 const tables = {}
 const players = {}
 
-tables[1] = new Table(1, 'Table 1', 6, 10, 'free')
+tables[1] = new Table(1, 'Table 1', 2, 10, 'free')
 tables[2] = new Table(2, 'Table 2', 6, 10, 'free')
 tables[3] = new Table(3, 'Table 3', 6, 20, 'free')
 tables[4] = new Table(4, 'Table 4', 6, 20, 'playToEarn')
@@ -39,6 +39,66 @@ module.exports = {
       tables[tableId].addPlayer(players[socket.id])
       socket.broadcast.emit('tables_updated', tables)
       socket.emit('table_joined', { tables, tableId })
+    })
+
+    socket.on('join_table', ({tableId,accountId}) => {
+      //TODO check what type of table PvP/Free/PlayToEarn
+      /**
+       * handle join_table
+       * because only input where can check it
+       */
+      if(accountId){
+        players[socket.id].accountId = accountId
+      }
+
+      tables[tableId].addPlayer(players[socket.id])
+      socket.broadcast.emit('tables_updated', tables)
+      socket.emit('table_joined', { tables, tableId })
+    })
+
+    socket.on('join_table_sit_to_play', ({tableId,accountId}) => {
+      if(accountId){
+        players[socket.id].accountId = accountId
+      }
+
+      const table = tables[tableId]
+
+      table.addPlayer(players[socket.id])
+
+      const player = players[socket.id]
+
+      const amount = 10;
+      let seatId = -1;
+
+      for(let key in table.seats) {
+        if (!table.seats[key]) {
+          seatId = +key;
+          break;
+        }
+      }
+
+
+      console.log('>> ', table.activePlayers(), Object.keys(table.seats).length)
+
+      socket.broadcast.emit('tables_updated', tables)
+      socket.emit('table_joined', { tables, tableId })
+
+
+        table.sitPlayer(player, seatId, amount)
+        let message = `${player.name} sat down in Seat ${seatId}`
+
+
+        updatePlayerBankroll(player, -(amount))
+        broadcastToTable(table, message)
+
+
+        if (table.activePlayers().length === Object.keys(table.seats).length) {
+          console.log('xxxx');
+          initNewHand(table)
+        }
+
+
+
     })
 
     socket.on('leave_table', tableId => {
@@ -173,11 +233,12 @@ module.exports = {
     })
 
     async function updatePlayerBankroll(player, amount) {
-      const user = await db.User.findById(player.id)
+      const user = await db.User.findByPk(player.id)
       await db.User.update(
         { bankroll: user.bankroll + amount },
         { where: { id: player.id } }
       )
+      console.log('hello ')
       players[socket.id].bankroll = user.bankroll + amount
       io.to(socket.id).emit('players_updated', players)
     }
@@ -273,9 +334,18 @@ module.exports = {
       if (table.activePlayers().length > 1) {
         broadcastToTable(table, '---New hand starting in 5 seconds---')
       }
+      console.log('xxx ppp 1')
       setTimeout(() => {
-        table.startHand()
-        broadcastToTable(table)
+        console.log('xxx ppp 2')
+        // try {
+          table.startHand()
+          console.log('xxx ppp 3', table)
+          broadcastToTable(table)
+
+        // } catch(e) {
+        //   console.log('eeer', e)
+        // }
+        console.log('xxx ppp 4')
       }, 5000)
     }
 

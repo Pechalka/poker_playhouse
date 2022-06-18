@@ -1,4 +1,22 @@
 @media screen and (min-height: 1050px) {
+  .seat1of2 {
+    left: 475px;
+    top: 95px;
+    
+    .bet {
+      top: 155px;
+    }
+  }
+  .seat2of2 {
+    top: 195px;
+    left: 895px;
+  
+    .bet {
+      top: 145px;
+      left: -150px;
+    }
+  }
+
   .seat1of6 {
     left: 475px;
     top: 95px;
@@ -53,6 +71,24 @@
   }
 }
 @media screen and (max-height: 1049px) {
+  .seat1of2 {
+    left: 475px;
+    top: 25px;
+    
+    .bet {
+      top: 170px;
+    }
+  }
+  .seat2of2 {
+    top: 125px;
+    left: 895px;
+   
+    .bet {
+      top: 160px;
+      left: -150px;
+    }
+  }
+
   .seat1of6 {
     left: 475px;
     top: 25px;

@@ -398,7 +398,7 @@ const Lobby = (props) => {
   const handleTableClick = tableId => {
     if (Object.keys(props.openTables).length < 4) {
 
-      socket.emit('join_table', { tableId, accountId  })
+      socket.emit('join_table_sit_to_play', { tableId, accountId  })
     }
     setOnMenu(false);
     // this.setState({ onMenu: false })
