@@ -31,9 +31,12 @@ module.exports = {
                 tokens: 100000,
                 experience: 0,
               }
-            ]
+            ],
+            Ticket:{
+              count: 5
+            }
           }, {
-            include: [ db.Account ]
+            include: [ db.Account, db.Ticket ]
           }).then(user => {
               console.log('user ', user);
 

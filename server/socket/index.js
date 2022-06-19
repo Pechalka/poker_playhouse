@@ -17,10 +17,35 @@ tables[8] = new Table(8, 'Table 8', 9, 20, 'PvP')
 tables[9] = new Table(9, 'Table 9', 9, 20, 'PvP')
 tables[10] = new Table(10, 'Table 10', 9, 50, 'PvP')
 
+
+function validatePlayer(player){
+  if(player.getTickets() < 1){
+    //TODO emit event for frontend thats say user has no tickets
+    console.log('Player tickets not enought')
+  }
+  return true;
+}
+
 module.exports = {
   init(socket, io) {
-    socket.on('fetch_lobby_info', user => {
-      players[socket.id] = new Player(socket.id, user.id, user.username, user.bankroll)
+    function fetchPlayerInfo(userId){
+      return db.Ticket.findOne({
+        attributes: ['count'],
+        where:{
+          user_id: userId
+        }
+      })
+    }
+    socket.on('fetch_lobby_info', async (user) => {
+      const tickets = await fetchPlayerInfo(user.id)
+      
+      if(!tickets){
+        console.log('tickets cant be null')
+      }
+
+      players[socket.id] = new Player(socket.id, user.id, user.username, user.bankroll,null,tickets.count)
+
+      validatePlayer(players[socket.id])
 
       socket.emit('receive_lobby_info', { tables, players, socketId: socket.id })
       socket.broadcast.emit('players_updated', players)
@@ -57,17 +82,23 @@ module.exports = {
     })
 
     socket.on('join_table_sit_to_play', ({tableId,accountId}) => {
+      const player = players[socket.id]
+      
       if(accountId){
-        players[socket.id].accountId = accountId
+        player.accountId = accountId
       }
 
       const table = tables[tableId]
 
-      table.addPlayer(players[socket.id])
+      validatePlayer(player)
 
-      const player = players[socket.id]
+      player.decreaseTicketsCount()
+      //TODO add save ticket count
+      
+      table.addPlayer(player)
 
       const amount = 10;
+
       let seatId = -1;
 
       for(let key in table.seats) {
@@ -96,9 +127,6 @@ module.exports = {
           console.log('xxxx');
           initNewHand(table)
         }
-
-
-
     })
 
     socket.on('leave_table', tableId => {
@@ -219,10 +247,10 @@ module.exports = {
       }
     })
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
       const seat = findSeatBySocketId(socket.id)
       if (seat) {
-        updatePlayerBankroll(seat.player, seat.stack)
+        await updatePlayerBankroll(seat.player, seat.stack)
       }
 
       delete players[socket.id]
