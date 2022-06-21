@@ -17,25 +17,8 @@ tables[8] = new Table(8, 'Table 8', 9, 20, 'PvP')
 tables[9] = new Table(9, 'Table 9', 9, 20, 'PvP')
 tables[10] = new Table(10, 'Table 10', 9, 50, 'PvP')
 
-
-function validatePlayer(player){
-  if(player.getTickets() < 1){
-    //TODO emit event for frontend thats say user has no tickets
-    console.log('Player tickets not enought')
-  }
-  return true;
-}
-
 module.exports = {
   init(socket, io) {
-    function fetchPlayerInfo(userId){
-      return db.Ticket.findOne({
-        attributes: ['count'],
-        where:{
-          user_id: userId
-        }
-      })
-    }
     socket.on('fetch_lobby_info', async (user) => {
       players[socket.id] = new Player(socket.id, user.id, user.username, user.bankroll)
 
@@ -73,16 +56,41 @@ module.exports = {
       socket.emit('table_joined', { tables, tableId })
     })
 
-    socket.on('sitAndPlayStart', (accountId) => {
+    socket.on('sitAndPlayStart', async (accountId) => {
       const tableId = 1;
-
-      players[socket.id].accountId = accountId
       
+      const player = players[socket.id]
+      if(!player){
+        console.log('socket:sitAndPlayStart: player by socket doesnt found')
+        return
+      }
+      player.accountId = accountId
+
+      let account = await db.Account.findOne({
+        where: {
+          id: accountId
+        }
+      })
+      
+      if(account.tickets < 1) {
+        console.log('socket:sitAndPlayStart: tickets not enought')
+        
+        return;
+      }
+
+      const tickets = account.tickets-1
+      
+      account.set({
+        tickets
+      })
+
+      account = await account.save()
+
+      player.account = account
+
       const table = tables[tableId]
 
-      table.addPlayer(players[socket.id])
-
-      const player = players[socket.id]
+      table.addPlayer(player)
 
       const amount = 1500;
       let seatId = -1;
@@ -98,28 +106,31 @@ module.exports = {
       console.log('>> ', table.activePlayers(), Object.keys(table.seats).length)
 
       socket.broadcast.emit('tables_updated', tables)
+      
       socket.emit('table_joined', { tables, tableId })
 
 
-        table.sitPlayer(player, seatId, amount)
-        let message = `${player.name} sat down in Seat ${seatId}`
+      table.sitPlayer(player, seatId, amount)
+      let message = `${player.name} sat down in Seat ${seatId}`
 
 
-        // updatePlayerBankroll(player, -(amount))
-         
-        players[socket.id].bankroll = amount
+      // updatePlayerBankroll(player, -(amount))
+        
+      player.bankroll = amount
 
-        broadcastToTable(table, message)
+      broadcastToTable(table, message)
 
+      socket.broadcast.emit('players_updated', players)
 
-        if (table.activePlayers().length === Object.keys(table.seats).length) {
-          initNewHand(table)
+      if (table.activePlayers().length === Object.keys(table.seats).length) {
+        initNewHand(table)
 
-          for (let i = 0; i < table.players.length; i++) {
-            let socketId = table.players[i].socketId
-            io.to(socketId).emit('game_start')
-          }
+        for (let i = 0; i < table.players.length; i++) {
+          let socketId = table.players[i].socketId
+          io.to(socketId).emit('game_start')
         }
+      }
+
     })
 
     socket.on('join_table_sit_to_play', ({tableId,accountId}) => {
@@ -131,9 +142,6 @@ module.exports = {
 
       const table = tables[tableId]
 
-      validatePlayer(player)
-
-      player.decreaseTicketsCount()
       //TODO add save ticket count
       
       table.addPlayer(player)
