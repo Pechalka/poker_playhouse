@@ -1,0 +1,82 @@
+version: "3.5"
+
+services:
+  local_db:
+    container_name: local_db_container
+    image: postgres
+    environment:
+      POSTGRES_USER: "${DATABASE_POSTGRES_USER:-user}"
+      POSTGRES_PASSWORD: "${DATABASE_POSTGRES_PASSWORD:-1}"
+      PGDATA: /data/postgres
+    volumes:
+      - pgdata:/data/postgres
+      - ./backups:/backups
+    ports:
+      - "${DATABASE_POSTGRES_PORT:-5801}:5432"
+    # command: sh -c "postgres -U user -c wal_level = hot_standby && postgres -c wal_keep_segments = 1000"
+    restart: unless-stopped
+    mem_limit: 4GB
+
+  local_admin:
+    container_name: local_db_admin_container
+    image: dpage/pgadmin4:4.21
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "${DATABASE_PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}"
+      PGADMIN_DEFAULT_PASSWORD: "${DATABASE_PGADMIN_DEFAULT_PASSWORD:-admin}"
+    volumes:
+      - ./tmp/storages/knomary_pgadmin:/root/.pgadmin
+    ports:
+      - "5683:80"
+    restart: unless-stopped
+    depends_on:
+      - local_db
+
+  # local_cache_redis:
+  #   image: "bitnami/redis:6.0.13"
+  #   container_name: "local_cache_container"
+  #   environment:
+  #     - ALLOW_EMPTY_PASSWORD=yes
+  #   ports:
+  #     - ${DATABASE_REDIS_PORT}:6379
+  #   volumes:
+  #     - ./tmp/storages/session_redis:/bitnami/redis/data
+  #   restart: unless-stopped
+  #   command: redis-server --requirepass 1
+
+  # local_queue_redis:
+  #   image: "bitnami/redis:6.0.13"
+  #   container_name: "local_queue_container"
+  #   environment:
+  #     - ALLOW_EMPTY_PASSWORD=yes
+  #   ports:
+  #     - ${QUEUE_REDIS_PORT}:6379
+  #   volumes:
+  #     - ./tmp/storages/queue1_redis:/bitnami/redis/data
+  #   restart: unless-stopped
+  #   command: redis-server --requirepass 1
+
+  # bullboard:
+  #   container_name: bullboard
+  #   image: hellsingi/bull_board:0.0.4
+  #   restart: always
+  #   ports:
+  #     - 6444:3000
+  #   environment:
+  #     REDIS_HOST: "host.docker.internal"
+  #     REDIS_PORT: 6380
+  #     REDIS_PASSWORD: 1
+  #     REDIS_USE_TLS: "false"
+  #     BULL_PREFIX: bull
+  #   depends_on:
+  #     - local_queue_redis
+
+  # test_fakemailer:
+  #   container_name: "ci_test_fakemailer_container"
+  #   image: reachfive/fake-smtp-server:latest
+  #   ports:
+  #     - "${FAKEMAILER_HTTP_PORT:-6868}:1080"
+  #     - "${FAKEMAILER_SMTP_PORT:-6869}:1025"
+  #   restart: unless-stopped
+
+volumes:
+  pgdata:

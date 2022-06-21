@@ -19,7 +19,7 @@ tables[10] = new Table(10, 'Table 10', 9, 50, 'PvP')
 
 module.exports = {
   init(socket, io) {
-    socket.on('fetch_lobby_info', user => {
+    socket.on('fetch_lobby_info', async (user) => {
       players[socket.id] = new Player(socket.id, user.id, user.username, user.bankroll)
 
       socket.emit('receive_lobby_info', { tables, players, socketId: socket.id })
@@ -56,16 +56,41 @@ module.exports = {
       socket.emit('table_joined', { tables, tableId })
     })
 
-    socket.on('sitAndPlayStart', (accountId) => {
-      const tableId = 1; // TOOD: find table
-
-      players[socket.id].accountId = accountId
+    socket.on('sitAndPlayStart', async (accountId) => {
+      const tableId = 1;
       
+      const player = players[socket.id]
+      if(!player){
+        console.log('socket:sitAndPlayStart: player by socket doesnt found')
+        return
+      }
+      player.accountId = accountId
+
+      let account = await db.Account.findOne({
+        where: {
+          id: accountId
+        }
+      })
+      
+      if(account.tickets < 1) {
+        console.log('socket:sitAndPlayStart: tickets not enought')
+        
+        return;
+      }
+
+      const tickets = account.tickets-1
+      
+      account.set({
+        tickets
+      })
+
+      account = await account.save()
+
+      player.account = account
+
       const table = tables[tableId]
 
-      table.addPlayer(players[socket.id])
-
-      const player = players[socket.id]
+      table.addPlayer(player)
 
       const amount = 1500;
       let seatId = -1;
@@ -78,26 +103,30 @@ module.exports = {
       }
 
       socket.broadcast.emit('tables_updated', tables)
+      
       socket.emit('table_joined', { tables, tableId })
 
 
-        table.sitPlayer(player, seatId, amount)
-        let message = `${player.name} sat down in Seat ${seatId}`
+      table.sitPlayer(player, seatId, amount)
+      let message = `${player.name} sat down in Seat ${seatId}`
+      
+      // updatePlayerBankroll(player, -(amount))
+        
+      player.bankroll = amount
 
-         
-        players[socket.id].bankroll = amount
+      broadcastToTable(table, message)
 
-        broadcastToTable(table, message)
+      socket.broadcast.emit('players_updated', players)
 
+      if (table.activePlayers().length === Object.keys(table.seats).length) {
+        initNewHand(table)
 
-        if (table.activePlayers().length === Object.keys(table.seats).length) {
-          initNewHand(table)
-
-          for (let i = 0; i < table.players.length; i++) {
-            let socketId = table.players[i].socketId
-            io.to(socketId).emit('game_start')
-          }
+        for (let i = 0; i < table.players.length; i++) {
+          let socketId = table.players[i].socketId
+          io.to(socketId).emit('game_start')
         }
+      }
+
     })
 
     // socket.on('join_table_sit_to_play', ({tableId,accountId}) => {

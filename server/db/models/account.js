@@ -13,6 +13,9 @@ module.exports = function (sequelize, DataTypes) {
 	  experience: {
       type: DataTypes.INTEGER,
     },
+    tickets: {
+      type: DataTypes.INTEGER,
+    },
   });
 
   Account.associate = models => {
