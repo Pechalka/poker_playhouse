@@ -395,9 +395,6 @@ module.exports = {
       setTimeout(async () => {
         table.changeTurn(seatId)
         broadcastToTable(table)
-    
-        console.log('handOver ', table);
-    
         if (table.handOver) {
           if (table.activePlayers().length === 1) {
             const tableId = table.id;
@@ -424,8 +421,6 @@ module.exports = {
             })
     
             table.resetEmptyTable();
-            console.log('tables ', tables);
-    
             socket.broadcast.emit('tables_updated', tables)
     
     
