@@ -37,15 +37,7 @@ module.exports = {
       })
     }
     socket.on('fetch_lobby_info', async (user) => {
-      const tickets = await fetchPlayerInfo(user.id)
-      
-      if(!tickets){
-        console.log('tickets cant be null')
-      }
-
-      players[socket.id] = new Player(socket.id, user.id, user.username, user.bankroll,null,tickets.count)
-
-      validatePlayer(players[socket.id])
+      players[socket.id] = new Player(socket.id, user.id, user.username, user.bankroll)
 
       socket.emit('receive_lobby_info', { tables, players, socketId: socket.id })
       socket.broadcast.emit('players_updated', players)

@@ -24,19 +24,18 @@ module.exports = {
                 level: 1,
                 tokens: 100,
                 experience: 0,
+                tickets: 5, 
               },
               {
                 name: body.username + ' account2',
                 level: 10,
                 tokens: 100000,
                 experience: 0,
+                tickets: 5,
               }
-            ],
-            Ticket:{
-              count: 5
-            }
+            ]
           }, {
-            include: [ db.Account, db.Ticket ]
+            include: [ db.Account ]
           }).then(user => {
               console.log('user ', user);
 
