@@ -158,14 +158,14 @@ class MainMenu extends React.Component<Props, State> {
     )
     if (!userPlayer) return null;
 
-    const tablesByType = Object.entries(tables).map(item => item[1]).reduce((acc, item) => {
-      if (!acc[item.type]) acc[item.type] = { [item.id]: item };
-      else acc[item.type] = { ...acc[item.type], [item.id]: item };
+    // const tablesByType = Object.entries(tables).map(item => item[1]).reduce((acc, item) => {
+    //   if (!acc[item.type]) acc[item.type] = { [item.id]: item };
+    //   else acc[item.type] = { ...acc[item.type], [item.id]: item };
 
-      return acc;
-    }, {})
+    //   return acc;
+    // }, {})
 
-    console.log('tables ', tables, Object.keys(openTables));
+    console.log('tables ', tables, openTables);
 
 
 
