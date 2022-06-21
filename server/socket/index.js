@@ -1,4 +1,5 @@
 // @flow
+const sequelize = require('sequelize')
 const db = require('../db/models')
 const Player = require('../poker/player.js')
 const Table = require('../poker/table.js')
@@ -316,37 +317,38 @@ module.exports = {
       io.to(socket.id).emit('players_updated', players)
     }
 
-    async function broadcastRake(table){
-       /**
-         * One handle for all games free/PvP/PlayToEarn
-         * thats why need to check if accountId exist
-         */
-        if(table.type === "playToEarn" ){
-          //get winner id and rake
-          const seatsAndCombination = table.getWinners(Object.keys(table.seats).map(seatId => table.seats[seatId]))
-          const statistics = Object.keys(table.seats).reduce((acc,seatIndex)=>{
-            const seat = table.seats[seatIndex];
-            if(seat){
-              const isWinner = seatsAndCombination.some(combination => combination[0] == seatIndex);
-              const statistic = {
-                account_id:seat.player.accountId
-              };
-              if(isWinner){
-  
-                acc.push(Object.assign(statistic, {points: 200,
-                  tokens: 200}))
-              }else{
-                acc.push(Object.assign(statistic, {points: 100,
-                  tokens: 100}))
-              }
-            }
-            return acc;
-          },[]);
-          if(statistics.length){
-            await db.Statistics.bulkCreate(statistics)
+    async function broadcastRake(table) {
+      /**
+       * One handle for all games free/PvP/PlayToEarn
+       * thats why need to check if accountId exist
+       */
+      //get winner id and rake
+      const seatsAndCombination = table.getWinners(Object.keys(table.seats).map(seatId => table.seats[seatId]))
+      const statistics = Object.keys(table.seats).reduce((acc, seatIndex) => {
+        const seat = table.seats[seatIndex];
+        if (seat) {
+          const isWinner = seatsAndCombination.some(combination => combination[0] == seatIndex);
+          const statistic = {
+            account_id: seat.player.accountId
+          };
+          if (isWinner) {
+            acc.push(Object.assign(statistic, {
+              points: 200,
+              tokens: 200
+            }))
+          } else {
+            acc.push(Object.assign(statistic, {
+              points: 100,
+              tokens: 100
+            }))
           }
         }
-        return
+        return acc;
+      }, []);
+      if (statistics.length) {
+        await db.Statistics.bulkCreate(statistics)
+      }
+      return
     }
 
     async function saveHandHistory(table) {
@@ -393,34 +395,47 @@ module.exports = {
       setTimeout(async () => {
         table.changeTurn(seatId)
         broadcastToTable(table)
-
+    
         console.log('handOver ', table);
-
+    
         if (table.handOver) {
           if (table.activePlayers().length === 1) {
             const tableId = table.id;
-
+    
             const players = table.players.map(p => p.socketId);
-
+    
+            const accountIds = table.players.map(p => p.accountId);
+    
             for (let i = 0; i < players.length; i++) {
               let socketId = players[i]
               table.removePlayer(socketId)
-              io.to(socketId).emit('table_left', { tables, tableId })
+              io.to(socketId).emit('table_left', {
+                tables,
+                tableId
+              })
             }
-
+    
+            await db.Account.update({
+              experience: sequelize.literal('experience + 16')
+            }, {
+              where: {
+                id: accountIds
+              }
+            })
+    
             table.resetEmptyTable();
             console.log('tables ', tables);
-
+    
             socket.broadcast.emit('tables_updated', tables)
-
-            // TODO add exp
+    
+    
           } else {
             await saveHandHistory(table)
             await broadcastRake(table)
-            initNewHand(table)            
+            initNewHand(table)
           }
-
-        } 
+    
+        }
       }, 1000)
     }
 
