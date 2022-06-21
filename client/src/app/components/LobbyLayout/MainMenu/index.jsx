@@ -4,6 +4,20 @@ import { css } from 'emotion'
 
 import TableList from './TableList'
 import PlayerList from './PlayerList'
+import { Button } from '../../../../components'
+
+import { Panel } from '../../../../components';
+
+const tableList = css`
+  text-align: center;
+  font-size: 16px;
+  border-spacing: 0 5px;
+`
+const tableHeader = css`
+  padding-bottom: 10px;
+  font-weight: 600;
+  font-size: 20px;
+`
 
 const styles = {
   tab: css`
@@ -114,7 +128,28 @@ class MainMenu extends React.Component<Props, State> {
       tables,
       handleTableClick,
       players,
+      account,
+      hadleSiteToPlay,
     } = this.props
+
+    // const activePlayers = React.useMemo(() => {
+    //   // if (Object.keys(openTables).length > 0) {
+    //   //   tables[openTables[]]
+    //   // }
+
+
+    //   return [];
+    // }, [tables, openTables])
+
+    const activePlayers = (function(){
+      if (Object.keys(openTables).length > 0) {
+        const tableId = +Object.keys(openTables)[0]
+
+        return tables[tableId].players.map(p => p.name)
+      }
+       return [];
+    })()
+
 
     if (!user) return null;
     const hasTableOpen = Object.keys(openTables).length > 0
@@ -130,11 +165,16 @@ class MainMenu extends React.Component<Props, State> {
       return acc;
     }, {})
 
+    console.log('tables ', tables, Object.keys(openTables));
+
+
+
+
     return (
       <div>
         <div className={styles.container}>
-          {this.renderTabs()}
-          {this.state.activeTab === 'free' &&
+          {/*{this.renderTabs()}*/}
+          {/*{this.state.activeTab === 'free' &&
             <TableList
             tables={tablesByType.free}
             onTableClick={handleTableClick}
@@ -157,7 +197,27 @@ class MainMenu extends React.Component<Props, State> {
             openTables={Object.keys(openTables)}
             hasTableOpen={hasTableOpen}
             />
-          }
+          }*/}
+          {!hasTableOpen && <Button disabled={!account} onClick={hadleSiteToPlay}>site to play</Button>}
+
+          {hasTableOpen && <Panel header={`Waiting players (${activePlayers.length}/2) ...`}>
+            <table className={tableList}>
+              <thead>
+                <tr>
+                  <th className={tableHeader}>Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activePlayers.map(player => (
+                  <tr key={player}>
+                    <td>{player}</td>
+                  </tr>
+                 ))}                
+              </tbody>
+            </table>
+          </Panel>}
+          
+
         </div>
       </div>
     )

@@ -73,6 +73,55 @@ module.exports = {
       socket.emit('table_joined', { tables, tableId })
     })
 
+    socket.on('sitAndPlayStart', (accountId) => {
+      const tableId = 1;
+
+      players[socket.id].accountId = accountId
+      
+      const table = tables[tableId]
+
+      table.addPlayer(players[socket.id])
+
+      const player = players[socket.id]
+
+      const amount = 1500;
+      let seatId = -1;
+
+      for(let key in table.seats) {
+        if (!table.seats[key]) {
+          seatId = +key;
+          break;
+        }
+      }
+
+
+      console.log('>> ', table.activePlayers(), Object.keys(table.seats).length)
+
+      socket.broadcast.emit('tables_updated', tables)
+      socket.emit('table_joined', { tables, tableId })
+
+
+        table.sitPlayer(player, seatId, amount)
+        let message = `${player.name} sat down in Seat ${seatId}`
+
+
+        // updatePlayerBankroll(player, -(amount))
+         
+        players[socket.id].bankroll = amount
+
+        broadcastToTable(table, message)
+
+
+        if (table.activePlayers().length === Object.keys(table.seats).length) {
+          initNewHand(table)
+
+          for (let i = 0; i < table.players.length; i++) {
+            let socketId = table.players[i].socketId
+            io.to(socketId).emit('game_start')
+          }
+        }
+    })
+
     socket.on('join_table_sit_to_play', ({tableId,accountId}) => {
       const player = players[socket.id]
       

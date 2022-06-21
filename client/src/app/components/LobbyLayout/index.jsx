@@ -356,6 +356,11 @@ const Lobby = (props) => {
         gameChat.scrollTop = gameChat.scrollHeight
       }
     })
+
+    socket.on('game_start', () => {
+      setOnMenu(false);
+    })
+
   }, [])
 
   // componentWillReceiveProps(nextProps) {
@@ -457,6 +462,10 @@ const Lobby = (props) => {
     socket.emit('fold', tableId)
   }
 
+  const hadleSiteToPlay = () => {
+    socket.emit('sitAndPlayStart', accountId)
+  }
+
   const sendTableMessage = (e, tableId) => {
     const body = e.target.value
 
@@ -499,6 +508,7 @@ const Lobby = (props) => {
             user={user}
             logout={props.logout}
             openTables={openTables}
+            hadleSiteToPlay={hadleSiteToPlay}
             tables={tables}
             handleTableClick={handleTableClick}
             players={players}
