@@ -67,7 +67,7 @@ module.exports = {
 
       const player = players[socket.id]
 
-      const amount = 10;
+      const amount = 1500;
       let seatId = -1;
 
       for(let key in table.seats) {
@@ -88,14 +88,20 @@ module.exports = {
         let message = `${player.name} sat down in Seat ${seatId}`
 
 
-        updatePlayerBankroll(player, -(amount))
+        // updatePlayerBankroll(player, -(amount))
+         
+        players[socket.id].bankroll = amount
+
         broadcastToTable(table, message)
 
 
         if (table.activePlayers().length === Object.keys(table.seats).length) {
           initNewHand(table)
 
-          socket.broadcast.emit('game_start')
+          for (let i = 0; i < table.players.length; i++) {
+            let socketId = table.players[i].socketId
+            io.to(socketId).emit('game_start')
+          }
         }
     })
 
