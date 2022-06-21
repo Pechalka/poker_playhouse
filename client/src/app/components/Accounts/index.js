@@ -45,8 +45,8 @@ const Accounts = ({ accounts, ...props }) => {
 				{accounts.map(account => (
 					<Panel key={account.id} dark className={groupList} header={account.name}>
 						<div  className={groupName}>
-							<Text large>level: {account.level}</Text>
-							<Text large>tokens: {account.experience}</Text>
+							<Text large>tickets: {account.tickets}</Text>
+							<Text large>experience: {account.experience}</Text>
 						</div>
 
 						<Button onClick={() => props.selectAccount(account.id)} style={button}>

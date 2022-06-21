@@ -321,7 +321,7 @@ module.exports = {
          * One handle for all games free/PvP/PlayToEarn
          * thats why need to check if accountId exist
          */
-        if(table.type === "playToEarn" ){
+        // if(table.type === "playToEarn" ){
           //get winner id and rake
           const seatsAndCombination = table.getWinners(Object.keys(table.seats).map(seatId => table.seats[seatId]))
           const statistics = Object.keys(table.seats).reduce((acc,seatIndex)=>{
@@ -345,8 +345,8 @@ module.exports = {
           if(statistics.length){
             await db.Statistics.bulkCreate(statistics)
           }
-        }
-        return
+        // }
+        // return
     }
 
     async function saveHandHistory(table) {
@@ -394,8 +394,6 @@ module.exports = {
         table.changeTurn(seatId)
         broadcastToTable(table)
 
-        console.log('handOver ', table);
-
         if (table.handOver) {
           if (table.activePlayers().length === 1) {
             const tableId = table.id;
@@ -409,7 +407,6 @@ module.exports = {
             }
 
             table.resetEmptyTable();
-            console.log('tables ', tables);
 
             socket.broadcast.emit('tables_updated', tables)
 
