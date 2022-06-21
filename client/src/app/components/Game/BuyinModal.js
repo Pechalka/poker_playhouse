@@ -86,7 +86,8 @@ class BuyinModal extends React.Component<Props, State> {
   render() {
     const { open, table, seat } = this.props
     if (!table) return null
-    const mustBuyIn = table.handOver && seat && seat.stack == 0
+    const mustBuyIn = false;
+    //table.handOver && seat && seat.stack == 0
 
     return (
       <Dialog open={open || mustBuyIn}>

@@ -57,7 +57,7 @@ module.exports = {
     })
 
     socket.on('sitAndPlayStart', (accountId) => {
-      const tableId = 1;
+      const tableId = 1; // TOOD: find table
 
       players[socket.id].accountId = accountId
       
@@ -77,9 +77,6 @@ module.exports = {
         }
       }
 
-
-      console.log('>> ', table.activePlayers(), Object.keys(table.seats).length)
-
       socket.broadcast.emit('tables_updated', tables)
       socket.emit('table_joined', { tables, tableId })
 
@@ -87,8 +84,6 @@ module.exports = {
         table.sitPlayer(player, seatId, amount)
         let message = `${player.name} sat down in Seat ${seatId}`
 
-
-        // updatePlayerBankroll(player, -(amount))
          
         players[socket.id].bankroll = amount
 
@@ -105,50 +100,50 @@ module.exports = {
         }
     })
 
-    socket.on('join_table_sit_to_play', ({tableId,accountId}) => {
-      if(accountId){
-        players[socket.id].accountId = accountId
-      }
+    // socket.on('join_table_sit_to_play', ({tableId,accountId}) => {
+    //   if(accountId){
+    //     players[socket.id].accountId = accountId
+    //   }
 
-      const table = tables[tableId]
+    //   const table = tables[tableId]
 
-      table.addPlayer(players[socket.id])
+    //   table.addPlayer(players[socket.id])
 
-      const player = players[socket.id]
+    //   const player = players[socket.id]
 
-      const amount = 10;
-      let seatId = -1;
+    //   const amount = 10;
+    //   let seatId = -1;
 
-      for(let key in table.seats) {
-        if (!table.seats[key]) {
-          seatId = +key;
-          break;
-        }
-      }
-
-
-      console.log('>> ', table.activePlayers(), Object.keys(table.seats).length)
-
-      socket.broadcast.emit('tables_updated', tables)
-      socket.emit('table_joined', { tables, tableId })
+    //   for(let key in table.seats) {
+    //     if (!table.seats[key]) {
+    //       seatId = +key;
+    //       break;
+    //     }
+    //   }
 
 
-        table.sitPlayer(player, seatId, amount)
-        let message = `${player.name} sat down in Seat ${seatId}`
+    //   console.log('>> ', table.activePlayers(), Object.keys(table.seats).length)
+
+    //   socket.broadcast.emit('tables_updated', tables)
+    //   socket.emit('table_joined', { tables, tableId })
 
 
-        updatePlayerBankroll(player, -(amount))
-        broadcastToTable(table, message)
+    //     table.sitPlayer(player, seatId, amount)
+    //     let message = `${player.name} sat down in Seat ${seatId}`
 
 
-        if (table.activePlayers().length === Object.keys(table.seats).length) {
-          console.log('xxxx');
-          initNewHand(table)
-        }
+    //     updatePlayerBankroll(player, -(amount))
+    //     broadcastToTable(table, message)
+
+
+    //     if (table.activePlayers().length === Object.keys(table.seats).length) {
+    //       console.log('xxxx');
+    //       initNewHand(table)
+    //     }
 
 
 
-    })
+    // })
 
     socket.on('leave_table', tableId => {
       const table = tables[tableId]
@@ -287,7 +282,7 @@ module.exports = {
         { bankroll: user.bankroll + amount },
         { where: { id: player.id } }
       )
-      console.log('hello ')
+
       players[socket.id].bankroll = user.bankroll + amount
       io.to(socket.id).emit('players_updated', players)
     }
@@ -370,11 +365,33 @@ module.exports = {
         table.changeTurn(seatId)
         broadcastToTable(table)
 
+        console.log('handOver ', table);
+
         if (table.handOver) {
-          await saveHandHistory(table)
-          await broadcastRake(table)
-          initNewHand(table)
-        }
+          if (table.activePlayers().length === 1) {
+            const tableId = table.id;
+
+            const players = table.players.map(p => p.socketId);
+
+            for (let i = 0; i < players.length; i++) {
+              let socketId = players[i]
+              table.removePlayer(socketId)
+              io.to(socketId).emit('table_left', { tables, tableId })
+            }
+
+            table.resetEmptyTable();
+            console.log('tables ', tables);
+
+            socket.broadcast.emit('tables_updated', tables)
+
+            // TODO add exp
+          } else {
+            await saveHandHistory(table)
+            await broadcastRake(table)
+            initNewHand(table)            
+          }
+
+        } 
       }, 1000)
     }
 
@@ -383,18 +400,9 @@ module.exports = {
       if (table.activePlayers().length > 1) {
         broadcastToTable(table, '---New hand starting in 5 seconds---')
       }
-      console.log('xxx ppp 1')
       setTimeout(() => {
-        console.log('xxx ppp 2')
-        // try {
           table.startHand()
-          console.log('xxx ppp 3', table)
           broadcastToTable(table)
-
-        // } catch(e) {
-        //   console.log('eeer', e)
-        // }
-        console.log('xxx ppp 4')
       }, 5000)
     }
 

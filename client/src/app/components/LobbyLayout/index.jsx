@@ -348,6 +348,7 @@ const Lobby = (props) => {
     })
     socket.on('table_left', ({ tables, tableId }) => {
       tableLeft(tables, tableId)
+      setOnMenu(true);
     })
     socket.on('table_updated', ({ table, message, from }) => {
       tableUpdated(table, message, from)
