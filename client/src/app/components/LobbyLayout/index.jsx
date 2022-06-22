@@ -5,10 +5,10 @@ import { css } from 'emotion';
 
 import { useOutletContext, useLocation } from "react-router-dom";
 
-import { logout } from '../../actions/user'
+import { logout, accountUpdate } from '../../actions/user'
 import {
   receiveLobbyInfo, tablesUpdated, playersUpdated,
-  tableJoined, tableLeft, tableUpdated
+  tableJoined, tableLeft, tableUpdated,
 } from '../../actions/lobby'
 
 import MainMenu from './MainMenu'
@@ -325,7 +325,7 @@ const Lobby = (props) => {
   React.useEffect(() => {
     const {
       user, receiveLobbyInfo, tablesUpdated, playersUpdated,
-      tableJoined, tableLeft, tableUpdated
+      tableJoined, tableLeft, tableUpdated, accountUpdate
     } = props
 
     if (user) {
@@ -346,6 +346,11 @@ const Lobby = (props) => {
     socket.on('table_joined', ({ tables, tableId }) => {
       tableJoined(tables, tableId)
     })
+
+    socket.on('account_update', (account) => {
+      accountUpdate(account);
+    })
+
     socket.on('table_left', ({ tables, tableId }) => {
       tableLeft(tables, tableId)
       setOnMenu(true);
@@ -591,6 +596,7 @@ const mapDispatchToProps = ({
   tableJoined,
   tableLeft,
   tableUpdated,
+  accountUpdate,
 })
 
 export default connect(

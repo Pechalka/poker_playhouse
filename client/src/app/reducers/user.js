@@ -10,6 +10,7 @@ import {
   TOKEN_LOGIN_SUCCESS,
   TOKEN_LOGIN_FAILURE,
   SELECT_ACCOUNT,
+  ACCOUNT_UPDATE,
 } from '../actions/user'
 
 const initialState = {
@@ -44,6 +45,23 @@ function user(state = initialState, action) {
         token: action.token,
         errorMessage: ''
       }
+
+    case ACCOUNT_UPDATE: {
+      const { account } = action;
+      const accounts = state.user.accounts.map(a => {
+        if (a.id === account.id) return account;
+
+        return a;
+      })
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          accounts
+        }
+      };
+    }
+
     case LOGIN_FAILURE:
       return {
         isFetching: false,

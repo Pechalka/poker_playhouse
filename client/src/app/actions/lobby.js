@@ -5,6 +5,7 @@ export const TABLE_JOINED = 'TABLE_JOINED'
 export const TABLE_LEFT = 'TABLE_LEFT'
 export const TABLE_UPDATED = 'TABLE_UPDATED'
 
+
 export function receiveLobbyInfo(tables, players, socketId) {
   return {
     type: RECEIVE_LOBBY_INFO,

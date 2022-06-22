@@ -42,6 +42,10 @@ const styles = {
     max-width: 525px;
     margin: 200px auto 0;
   `,
+  alert: css`
+    padding: 10px;
+    padding-left: 0;
+  `,
 }
 
 type Props = {
@@ -150,6 +154,15 @@ class MainMenu extends React.Component<Props, State> {
        return [];
     })()
 
+    const maxPlayers = (function(){
+      if (Object.keys(openTables).length > 0) {
+        const tableId = +Object.keys(openTables)[0]
+
+        return tables[tableId].maxPlayers;
+      }
+       return 0;
+    })()
+
 
     if (!user) return null;
     const hasTableOpen = Object.keys(openTables).length > 0
@@ -168,7 +181,12 @@ class MainMenu extends React.Component<Props, State> {
     console.log('tables ', tables, openTables);
 
 
-
+    const noTikets = (function(){
+      if (account) {
+        return account.tickets < 1;
+      }
+      return false;
+    })()
 
     return (
       <div>
@@ -198,9 +216,9 @@ class MainMenu extends React.Component<Props, State> {
             hasTableOpen={hasTableOpen}
             />
           }*/}
-          {!hasTableOpen && <Button disabled={!account} onClick={hadleSiteToPlay}>sit & go</Button>}
+          {!hasTableOpen && <Button disabled={!account || noTikets} onClick={hadleSiteToPlay}>sit & go</Button>}
 
-          {hasTableOpen && <Panel header={`Waiting players (${activePlayers.length}/2) ...`}>
+          {hasTableOpen && <Panel header={`Waiting players (${activePlayers.length}/${maxPlayers}) ...`}>
             <table className={tableList}>
               <thead>
                 <tr>
@@ -216,7 +234,7 @@ class MainMenu extends React.Component<Props, State> {
               </tbody>
             </table>
           </Panel>}
-          
+          {noTikets && <div className={styles.alert}>no tikets for this account!</div>}
 
         </div>
       </div>

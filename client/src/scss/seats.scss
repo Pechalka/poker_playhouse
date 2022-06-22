@@ -17,6 +17,35 @@
     }
   }
 
+
+  .seat1of3 {
+    left: 475px;
+    top: 95px;
+    
+    .bet {
+      top: 155px;
+    }
+  }
+  .seat2of3 {
+    top: 195px;
+    left: 895px;
+  
+    .bet {
+      top: 145px;
+      left: -150px;
+    }
+  }
+  
+  .seat3of3 {
+    top: 460px;
+    left: 895px;
+    
+    .bet {
+      left: -150px;
+      bottom: 85px;
+    }
+  }
+
   .seat1of6 {
     left: 475px;
     top: 95px;
@@ -86,6 +115,33 @@
     .bet {
       top: 160px;
       left: -150px;
+    }
+  }
+
+  .seat1of3 {
+    left: 475px;
+    top: 25px;
+    
+    .bet {
+      top: 170px;
+    }
+  }
+  .seat2of3 {
+    top: 125px;
+    left: 895px;
+   
+    .bet {
+      top: 160px;
+      left: -150px;
+    }
+  }
+  .seat3of3 {
+    top: 390px;
+    left: 895px;
+    
+    .bet {
+      left: -150px;
+      bottom: 110px;
     }
   }
 

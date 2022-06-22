@@ -26,6 +26,15 @@ export const TOKEN_LOGIN_FAILURE = 'TOKEN_LOGIN_FAILURE'
 
 export const SELECT_ACCOUNT = 'SELECT_ACCOUNT'
 
+export const ACCOUNT_UPDATE = 'ACCOUNT_UPDATE';
+
+export function accountUpdate(account) {
+  return {
+    type: ACCOUNT_UPDATE,
+    account
+  }
+}
+
 const ROOT_URL = '/api';
 //location.href.indexOf('localhost') > 0 ? 'http://localhost:9000/api' : '/api'
 

@@ -7,7 +7,7 @@ const Table = require('../poker/table.js')
 const tables = {}
 const players = {}
 
-tables[1] = new Table(1, 'Table 1', 2, 10, 'free')
+tables[1] = new Table(1, 'Table 1', 3, 10, 'free')
 tables[2] = new Table(2, 'Table 2', 6, 10, 'free')
 tables[3] = new Table(3, 'Table 3', 6, 20, 'free')
 tables[4] = new Table(4, 'Table 4', 6, 20, 'playToEarn')
@@ -75,7 +75,6 @@ module.exports = {
       
       if(account.tickets < 1) {
         console.log('socket:sitAndPlayStart: tickets not enought')
-        
         return;
       }
 
@@ -89,11 +88,13 @@ module.exports = {
 
       player.account = account
 
+      socket.emit('account_update', account);
+
       const table = tables[tableId]
 
       table.addPlayer(player)
 
-      const amount = 1500;
+      const amount = 150;
       let seatId = -1;
 
       for(let key in table.seats) {
@@ -399,19 +400,10 @@ module.exports = {
           if (table.activePlayers().length === 1) {
             const tableId = table.id;
     
-            const players = table.players.map(p => p.socketId);
+            const players = table.players.map(p => [p.socketId, p.accountId]);
     
             const accountIds = table.players.map(p => p.accountId);
-    
-            for (let i = 0; i < players.length; i++) {
-              let socketId = players[i]
-              table.removePlayer(socketId)
-              io.to(socketId).emit('table_left', {
-                tables,
-                tableId
-              })
-            }
-    
+
             await db.Account.update({
               experience: sequelize.literal('experience + 16')
             }, {
@@ -419,6 +411,25 @@ module.exports = {
                 id: accountIds
               }
             })
+
+            for (let i = 0; i < players.length; i++) {
+              let socketId = players[i][0]
+              let accountId = players[i][1]
+
+              table.removePlayer(socketId)
+              io.to(socketId).emit('table_left', {
+                tables,
+                tableId
+              })
+
+              let account = await db.Account.findOne({
+                where: {
+                  id: accountId
+                }
+              })
+
+              io.to(socketId).emit('account_update', account);
+            }
     
             table.resetEmptyTable();
             socket.broadcast.emit('tables_updated', tables)

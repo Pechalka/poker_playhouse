@@ -121,7 +121,7 @@ const Leaderboard = () => {
 		    <div className="leaderboard-container">
 		      <div className="user">
 		        <h3 className="user__title">Узнай где ты</h3>
-		        <p className="user__text">Войти через криптокощелек</p>
+		        <p className="user__text">Войти через криптокошелек</p>
 		        <button onClick={handleEnter}>Войти</button>
 		      </div>
 		      <div className="leaderboard">
