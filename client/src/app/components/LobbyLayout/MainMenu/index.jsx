@@ -198,7 +198,7 @@ class MainMenu extends React.Component<Props, State> {
             hasTableOpen={hasTableOpen}
             />
           }*/}
-          {!hasTableOpen && <Button disabled={!account} onClick={hadleSiteToPlay}>sit to play</Button>}
+          {!hasTableOpen && <Button disabled={!account} onClick={hadleSiteToPlay}>sit & go</Button>}
 
           {hasTableOpen && <Panel header={`Waiting players (${activePlayers.length}/2) ...`}>
             <table className={tableList}>
