@@ -2,6 +2,7 @@ const db = require('../db/models');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt-nodejs');
 const utils = require('../utils');
+const sequelize = require('sequelize')
 
 module.exports = {
   signup(req, res) {
@@ -79,6 +80,19 @@ module.exports = {
           })
         })
       })
+  },
+  nextDay(req, res) {
+    db.Account.update({
+      tickets: sequelize.literal('tickets + 3')
+    }, {
+      where: {
+        id: {
+          [sequelize.Op.not]: '0'
+        }
+      }
+    })
+
+    res.json('ok');
   },
   verifyToken(req, res) {
     jwt.verify(req.body.token, process.env.JWT_SECRET, (err, decoded) => {

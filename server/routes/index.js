@@ -24,4 +24,6 @@ router.get('/users/search', searchUsersRoute.search);
 
 router.get('/users', searchUsersRoute.getAllUsers);
 
+router.get('/users/nextDay', authRoute.nextDay);
+
 module.exports = router;
