@@ -8,7 +8,9 @@ const tables = {}
 const players = {}
 const timeouts = {}
 
-tables[1] = new Table(1, 'Table 1', 3, 10, 'free')
+const INTERVAL_TO_INCREASE_BLIND = 60
+
+tables[1] = new Table(1, 'Table 1', 2, 10, 'free')
 tables[2] = new Table(2, 'Table 2', 6, 10, 'free')
 tables[3] = new Table(3, 'Table 3', 6, 20, 'free')
 tables[4] = new Table(4, 'Table 4', 6, 20, 'playToEarn')
@@ -131,6 +133,9 @@ module.exports = {
       socket.broadcast.emit('players_updated', players)
 
       if (table.activePlayers().length === Object.keys(table.seats).length) {
+        //need for calc when increase blind
+        table.tournamentStart = new Date();
+        
         initNewHand(table)
 
         for (let i = 0; i < table.players.length; i++) {
@@ -489,12 +494,18 @@ module.exports = {
       if(timeouts[table.id]){
         clearTimeout(timeouts[table.id])
       }
-
+      //
       table.clearWinMessages()
       if (table.activePlayers().length > 1) {
         broadcastToTable(table, '---New hand starting in 5 seconds---')
       }
       setTimeout(() => {
+          const needIncreaseBlind = (Math.floor(new Date() - table.tournamentStart) / 1000) - INTERVAL_TO_INCREASE_BLIND > 0 ? true : false
+          if(needIncreaseBlind){
+            table.minBet = table.minBet + table.minBet / 2
+            table.tournamentStart = new Date()
+          }
+
           table.startHand()
 
           table.lastTurn = table.turn

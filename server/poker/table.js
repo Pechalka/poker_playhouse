@@ -75,6 +75,7 @@ class Table {
     this.sidePots = []
     this.history = []
     this.type = type || 'free'
+    this.tournamentStart = 0
   }
   initSeats(maxPlayers) {
     const seats = {}
