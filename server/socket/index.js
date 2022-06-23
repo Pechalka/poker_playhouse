@@ -8,7 +8,7 @@ const tables = {}
 const players = {}
 const timeouts = {}
 
-tables[1] = new Table(1, 'Table 1', 2, 10, 'free')
+tables[1] = new Table(1, 'Table 1', 3, 10, 'free')
 tables[2] = new Table(2, 'Table 2', 6, 10, 'free')
 tables[3] = new Table(3, 'Table 3', 6, 20, 'free')
 tables[4] = new Table(4, 'Table 4', 6, 20, 'playToEarn')
@@ -137,7 +137,6 @@ module.exports = {
           let socketId = table.players[i].socketId
           io.to(socketId).emit('game_start')
         }
-        
       }
 
     })
@@ -308,7 +307,6 @@ module.exports = {
     socket.on('disconnect', async () => {
       const seat = findSeatBySocketId(socket.id)
       
-      const accountId = seat.player.accountId
       const bankroll = seat.player.bankroll
       let bankrollExist = false
       
@@ -414,13 +412,15 @@ module.exports = {
     }
 
     function changeTurnAndBroadcast(table, seatId) {
-      
+      // clear prev timeout
       if(timeouts[table.id]){
         clearTimeout(timeouts[table.id])
       }
 
       setTimeout(async () => {
+        //add time for turn
         timeouts[table.id] = setTimeout(()=>{
+          //if player doesnt make action current turn in game will be his
           if(table.turn === table.lastTurn){
             let { seatId, message } = table.handleFold(table.seats[table.turn].player.socketId)
             broadcastToTable(table, message)
@@ -429,7 +429,7 @@ module.exports = {
         },15000)
 
         table.changeTurn(seatId)
-        
+        //last turn is current turn, need for timeout
         table.lastTurn = table.turn
 
         broadcastToTable(table)
@@ -471,6 +471,7 @@ module.exports = {
     
             table.resetEmptyTable();
             socket.broadcast.emit('tables_updated', tables)
+            //if game end clear intervals
             if(timeouts[table.id]){
               clearTimeout(timeouts[table.id])
             }
@@ -488,14 +489,16 @@ module.exports = {
       if(timeouts[table.id]){
         clearTimeout(timeouts[table.id])
       }
-      
+
       table.clearWinMessages()
       if (table.activePlayers().length > 1) {
         broadcastToTable(table, '---New hand starting in 5 seconds---')
       }
       setTimeout(() => {
           table.startHand()
+
           table.lastTurn = table.turn
+          //on every new hand init timeout for tracking slopock on start
           timeouts[table.id] = setTimeout(()=>{
             if(table.turn === table.lastTurn){
               let { seatId, message } = table.handleFold(table.seats[table.turn].player.socketId)
