@@ -6,8 +6,9 @@ const Table = require('../poker/table.js')
 
 const tables = {}
 const players = {}
+const timeouts = {}
 
-tables[1] = new Table(1, 'Table 1', 3, 10, 'free')
+tables[1] = new Table(1, 'Table 1', 2, 10, 'free')
 tables[2] = new Table(2, 'Table 2', 6, 10, 'free')
 tables[3] = new Table(3, 'Table 3', 6, 20, 'free')
 tables[4] = new Table(4, 'Table 4', 6, 20, 'playToEarn')
@@ -42,24 +43,33 @@ module.exports = {
       socket.emit('table_joined', { tables, tableId })
     })
 
-    socket.on('join_table', ({tableId,accountId}) => {
-      //TODO check what type of table PvP/Free/PlayToEarn
-      /**
-       * handle join_table
-       * because only input where can check it
-       */
-      if(accountId){
-        players[socket.id].accountId = accountId
+    function needToReconnect(accountId, socketId){
+      let player = null
+      for(const tableIndex in tables){
+        for(playerOnCheckIndex in tables[tableIndex].players){
+          const playerOnCheck = tables[tableIndex].players[playerOnCheckIndex]
+          if(playerOnCheck.accountId === accountId){
+            // set state on new socket
+            players[socketId] = Object.assign({},players[playerOnCheck.socketId])
+            // delete old socket
+            delete players[playerOnCheck.socketId]
+            // change socket id for player in table
+            playerOnCheck.socketId = socketId
+            player = Object.assign({},playerOnCheck)
+          }
+        }
       }
-
-      tables[tableId].addPlayer(players[socket.id])
-      socket.broadcast.emit('tables_updated', tables)
-      socket.emit('table_joined', { tables, tableId })
-    })
+      return player
+    }
 
     socket.on('sitAndPlayStart', async (accountId) => {
       const tableId = 1;
-      
+      const playerInGame = needToReconnect(accountId, socket.id)
+      if(playerInGame){
+        socket.emit('table_joined', { tables, tableId })
+        io.to(socket.id).emit('game_start')
+        return
+      }
       const player = players[socket.id]
       if(!player){
         console.log('socket:sitAndPlayStart: player by socket doesnt found')
@@ -127,6 +137,7 @@ module.exports = {
           let socketId = table.players[i].socketId
           io.to(socketId).emit('game_start')
         }
+        
       }
 
     })
@@ -296,12 +307,22 @@ module.exports = {
 
     socket.on('disconnect', async () => {
       const seat = findSeatBySocketId(socket.id)
+      
+      const accountId = seat.player.accountId
+      const bankroll = seat.player.bankroll
+      let bankrollExist = false
+      
+      if(bankroll > 0){
+        bankrollExist = true
+      }
+      
       if (seat) {
         await updatePlayerBankroll(seat.player, seat.stack)
       }
-
-      delete players[socket.id]
-      removeFromTables(socket.id)
+      if(!bankrollExist){
+        delete players[socket.id]
+        removeFromTables(socket.id)
+      }
 
       socket.broadcast.emit('tables_updated', tables)
       socket.broadcast.emit('players_updated', players)
@@ -393,9 +414,26 @@ module.exports = {
     }
 
     function changeTurnAndBroadcast(table, seatId) {
+      
+      if(timeouts[table.id]){
+        clearTimeout(timeouts[table.id])
+      }
+
       setTimeout(async () => {
+        timeouts[table.id] = setTimeout(()=>{
+          if(table.turn === table.lastTurn){
+            let { seatId, message } = table.handleFold(table.seats[table.turn].player.socketId)
+            broadcastToTable(table, message)
+            changeTurnAndBroadcast(table, seatId)
+          }
+        },15000)
+
         table.changeTurn(seatId)
+        
+        table.lastTurn = table.turn
+
         broadcastToTable(table)
+
         if (table.handOver) {
           if (table.activePlayers().length === 1) {
             const tableId = table.id;
@@ -433,8 +471,9 @@ module.exports = {
     
             table.resetEmptyTable();
             socket.broadcast.emit('tables_updated', tables)
-    
-    
+            if(timeouts[table.id]){
+              clearTimeout(timeouts[table.id])
+            }
           } else {
             await saveHandHistory(table)
             await broadcastRake(table)
@@ -446,12 +485,24 @@ module.exports = {
     }
 
     function initNewHand(table) {
+      if(timeouts[table.id]){
+        clearTimeout(timeouts[table.id])
+      }
+      
       table.clearWinMessages()
       if (table.activePlayers().length > 1) {
         broadcastToTable(table, '---New hand starting in 5 seconds---')
       }
       setTimeout(() => {
           table.startHand()
+          table.lastTurn = table.turn
+          timeouts[table.id] = setTimeout(()=>{
+            if(table.turn === table.lastTurn){
+              let { seatId, message } = table.handleFold(table.seats[table.turn].player.socketId)
+              broadcastToTable(table, message)
+              changeTurnAndBroadcast(table, seatId)
+            }
+          },15000)
           broadcastToTable(table)
       }, 5000)
     }
