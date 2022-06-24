@@ -144,7 +144,7 @@
       bottom: 110px;
     }
   }
-
+///----- 6 
   .seat1of6 {
     left: 475px;
     top: 25px;
@@ -197,6 +197,91 @@
       right: -150px;
     }
   }
+// ----- 9 
+
+  .seat1of9 {
+    left: 695px;
+    top: 25px;
+    
+    .bet {
+      top: 170px;
+    }
+  }
+  .seat2of9 {
+    top: 125px;
+    left: 895px;
+   
+    .bet {
+      top: 160px;
+      left: -150px;
+    }
+  }
+  .seat3of9 {
+    top: 390px;
+    left: 895px;
+    
+    .bet {
+      left: -150px;
+      bottom: 110px;
+    }
+  }
+  .seat4of9 {
+    top: 490px;
+    left: 475px;
+    
+    .bet {
+      bottom: 150px;
+    }
+  }
+  .seat5of9 {
+    top: 460px;
+    left: 185px;
+    
+    .bet {
+      right: -120px;
+      bottom: 110px;
+    }
+  }
+  .seat6of9 {
+    top: 135px;
+    left: 15px;
+        
+    .bet {
+      top: 160px;
+      right: -150px;
+    }
+  }
+
+  .seat7of9 {
+    top: 295px;
+    left: 25px;
+    
+    .bet {
+      top: 160px;
+      right: -150px;
+    }
+  }
+
+  .seat8of9 {
+    top: 35px;
+    left: 95px;
+    
+    .bet {
+      top: 160px;
+      right: -150px;
+    }
+  }
+
+  .seat9of9 {
+    top: 25px;
+    left: 415px;
+
+    .bet {
+      top: 170px;
+      right: -50px;
+    }
+  }
+
 }
 .seat-container {
   color: #fff;

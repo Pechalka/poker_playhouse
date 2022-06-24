@@ -33,14 +33,26 @@ class Seats extends React.Component<Props> {
   render() {
     const { user, table, onSeatClick, displayOffset } = this.props
     let seats = Object.keys(table.seats)
+    //[1, 2, 3, 4, 5, 6, 7, 8, 9]
+    //Object.keys(table.seats)
     const seatedPlayerIds = seats.map(seatId => table.seats[seatId] && table.seats[seatId].id);
     const seated = seatedPlayerIds.includes(user.id);
 
     return (
       <div>
         {seats.map(seatId => {
+
           const seat = table.seats[seatId]
+          {/*{ 
+            turn: false, id: seatId, player: { name : 'sdfsdf'},
+            hand: [],
+            bet: 1,
+            stack: 10,
+          };*/}
+          //table.seats[seatId]
           const isButton = parseInt(seatId) === table.button ? true : false
+          //false;
+          // parseInt(seatId) === table.button ? true : false
 
           let displayOrder
           if (parseInt(seatId) + displayOffset > table.maxPlayers) {
