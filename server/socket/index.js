@@ -10,7 +10,7 @@ const timeouts = {}
 
 const INTERVAL_TO_INCREASE_BLIND = 60
 
-tables[1] = new Table(1, 'Table 1', 2, 10, 'free')
+tables[1] = new Table(1, 'Table 1', 9, 10, 'free')
 tables[2] = new Table(2, 'Table 2', 6, 10, 'free')
 tables[3] = new Table(3, 'Table 3', 6, 20, 'free')
 tables[4] = new Table(4, 'Table 4', 6, 20, 'playToEarn')
