@@ -8,5 +8,15 @@ module.exports = {
       PORT:3000,
       NODE_ENV:"production"
     },
+  },
+  {
+    name: 'pokerhouse',
+    test_user: 'qwerty',
+    script: './server/index.js',
+    env:{
+      JWT_SECRET:"test",
+      PORT:3000,
+      NODE_ENV:"production"
+    },
   }],
 };
