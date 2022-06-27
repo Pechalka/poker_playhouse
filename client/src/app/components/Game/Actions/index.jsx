@@ -8,8 +8,8 @@ import { blueGrey } from 'material-ui/styles/colors'
 const styles = {
   container: {
     position: 'absolute',
-    width: 'calc(50vw - 10px)',
-    height: '184px',
+    width: 'calc(30vw - 10px)',
+    height: '154px',
     padding: '5px',
     left: '0',
     bottom: '0',
@@ -95,6 +95,9 @@ class Actions extends React.Component {
       ['Pot', pot],
       ['All in', seat.bet + seat.stack]
     ]
+
+    console.log('table ', table);
+    console.log('seat ', seat);
 
     return (
       <div style={styles.container}>

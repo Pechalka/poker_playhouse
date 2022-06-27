@@ -88,7 +88,34 @@ class Seats extends React.Component<Props> {
               </div>
             )
           } else {
-            return <div key={seatId}></div>
+            {
+              {/*return <div key={seatId}></div>*/}
+              return (
+                <div key={seatId} className={className}>
+                  <EmptySeat
+                    text='waiting...'
+                    seatId={seatId}
+                    amount={1500}
+                    // onSeatClick={e => {
+                    //   if (e) e.stopPropagation()
+                    //   onSeatClick(table.id, parseInt(seatId))
+                    // }}
+                  />
+                </div>
+              )
+            }
+            {/*return <div key={seatId} className={className}>
+              <SeatedPlayer
+                  user={{ name: 'empty' }}
+                  seat={{ 
+                    turn: false, id: seatId, player: { name : 'no player'},
+                    hand: [],
+                    bet: 1500,
+                    stack: 0,
+                  }}
+                  isButton={false}
+                />
+            </div>*/}
           }
         })}
       </div>

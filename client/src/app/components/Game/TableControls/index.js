@@ -8,7 +8,7 @@ const styles = {
   container: {
     position: 'absolute',
     top: '-30px',
-    left: '250px',
+    right: '10px',
   },
   button: {
     minWidth: '10px',
@@ -45,7 +45,7 @@ function TableControls(props: Props) {
       >
         <Icon className={css`transform: rotate(90deg) scaleX(-1);`}>replay</Icon>
       </Button>
-      <Button
+      {/*<Button
         color="primary"
         style={styles.button}
         onClick={onStandClick}
@@ -58,7 +58,7 @@ function TableControls(props: Props) {
         onClick={onLeaveClick}
       >
         <Icon>exit_to_app</Icon>
-      </Button>
+      </Button>*/}
     </div>
   )
 }  

@@ -217,29 +217,30 @@
     }
   }
   .seat3of9 {
-    top: 390px;
-    left: 895px;
+    top: 330px;
+    left: 960px;
     
     .bet {
-      left: -150px;
-      bottom: 110px;
+      left: -190px;
+      bottom: 50px;
     }
   }
   .seat4of9 {
-    top: 490px;
-    left: 475px;
+    top: 450px;
+    left: 670px;
     
     .bet {
-      bottom: 150px;
+      bottom: 90px;
+      left: -130px;
     }
   }
   .seat5of9 {
-    top: 460px;
-    left: 185px;
+    top: 450px;
+    left: 325px;
     
     .bet {
-      right: -120px;
-      bottom: 110px;
+      right: -110px;
+      bottom: 90px;
     }
   }
   .seat6of9 {
@@ -253,32 +254,32 @@
   }
 
   .seat7of9 {
-    top: 295px;
-    left: 25px;
-    
-    .bet {
-      top: 160px;
-      right: -150px;
-    }
-  }
-
-  .seat8of9 {
-    top: 35px;
-    left: 95px;
-    
-    .bet {
-      top: 160px;
-      right: -150px;
-    }
-  }
-
-  .seat9of9 {
     top: 25px;
     left: 415px;
 
     .bet {
       top: 170px;
       right: -50px;
+    }
+  }
+
+  .seat8of9 {
+    top: 25px;
+    left: 190px;
+    
+    .bet {
+      top: 160px;
+      right: -25px;
+    }
+  }
+
+  .seat9of9 {
+    top: 330px;
+    left: 25px;
+    
+    .bet {
+      top: 100px;
+      right: -160px;
     }
   }
 

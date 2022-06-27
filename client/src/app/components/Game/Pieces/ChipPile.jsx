@@ -16,9 +16,13 @@ type Props = {
   amount: number,
   classes: Object,
 }
-const ChipPile = ({ amount, classes }: Props) => {
+const ChipPile = ({
+  amount, 
+  classes
+}: Props) => {
+  // const amount = 1500;
   // deal with floating point numbers
-  let cents = amount * 100
+  let cents = amount //* 100
 
   let tenDollarChips,
       oneDollarChips,

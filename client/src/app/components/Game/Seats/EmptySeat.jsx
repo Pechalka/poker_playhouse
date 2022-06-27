@@ -7,15 +7,15 @@ type Props = {
   seatId: string,
   onSeatClick: () => void
 }
-const EmptySeat = ({ seatId, onSeatClick }: Props) => (
+const EmptySeat = ({ seatId, onSeatClick, text= 'SIT HERE', amount = 0.0 }: Props) => (
   <Paper onClick={onSeatClick} className="seat-info" style={{ borderRadius: '4px' }}>
     <div className="seat-stack" style={{ background: blueGrey[900] }}>
-      SIT HERE
+      {text}
     </div>
 
     <div>
       <div className="seat-number" style={{ background: cyan[600] }}>{seatId}</div>
-      <div className="seat-player" style={{ color: '#ccc', background: cyan[900] }}>$0.00</div>
+      <div className="seat-player" style={{ color: '#ccc', background: cyan[900] }}>${amount}</div>
     </div>
   </Paper>
 )

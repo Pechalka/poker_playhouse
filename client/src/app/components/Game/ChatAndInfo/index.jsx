@@ -10,7 +10,7 @@ import SitOutCheckbox from './SitOutCheckbox';
 const styles = {
   container: {
     position: 'absolute',
-    width: 'calc(50vw - 10px)',
+    width: 'calc(30vw - 10px)',
     height: '184px',
     padding: '5px',
     right: '0',
@@ -66,7 +66,7 @@ class ChatAndInfo extends React.Component<Props> {
   }
 
   render() {
-    const tabs = ['Chat', 'Players', 'Table Info']
+    const tabs = ['Chat'];//, 'Players', 'Table Info']
     const { user, table } = this.props;
 
     return (
@@ -93,7 +93,7 @@ class ChatAndInfo extends React.Component<Props> {
         {this.state.activeTab === 'Chat' &&
           <Chat {...this.props} />
         }
-        {this.state.activeTab === 'Players' &&
+   {/*     {this.state.activeTab === 'Players' &&
           <Spectators
             user={user}
             table={table}
@@ -105,7 +105,7 @@ class ChatAndInfo extends React.Component<Props> {
           </div>
         }
 
-        <SitOutCheckbox {...this.props} />
+        <SitOutCheckbox {...this.props} />*/}
       </div>
     )
   }

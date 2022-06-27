@@ -106,7 +106,7 @@ module.exports = {
 
       table.addPlayer(player)
 
-      const amount = 150;
+      const amount = 1500;
       let seatId = -1;
 
       for(let key in table.seats) {
@@ -132,7 +132,9 @@ module.exports = {
 
       socket.broadcast.emit('players_updated', players)
 
-      if (table.activePlayers().length === Object.keys(table.seats).length) {
+//      if (table.activePlayers().length === Object.keys(table.seats).length) {
+
+      if (table.activePlayers().length > 1) {
         //need for calc when increase blind
         table.tournamentStart = new Date();
         

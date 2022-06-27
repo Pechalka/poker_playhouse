@@ -11,7 +11,7 @@ const styleSheet = createStyleSheet('ActionButtons', () => ({
     flex: 1,
     color: '#fff',
     margin: '3px',
-    height: '80px',
+    height: '40px',
     padding: '0px 20px',
     fontSize: '16px',
     fontFamily: 'Montserrat, sans-serif',
