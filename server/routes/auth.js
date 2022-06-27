@@ -57,7 +57,12 @@ module.exports = {
     const { body } = req;
 
     db.User
-      .findOne({ where: { username: body.username } })
+      .findOne({ 
+        where: { username: body.username},
+        include: [{
+          model: db.Account,
+        }]
+      })
       .then(user => {
         if (!user) {
           return res.status(404).json({

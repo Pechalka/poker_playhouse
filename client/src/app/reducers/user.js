@@ -48,6 +48,7 @@ function user(state = initialState, action) {
 
     case ACCOUNT_UPDATE: {
       const { account } = action;
+      console.log('action ', action);
       const accounts = state.user.accounts.map(a => {
         if (a.id === account.id) return account;
 
