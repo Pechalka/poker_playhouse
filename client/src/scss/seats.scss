@@ -244,6 +244,16 @@
     }
   }
   .seat6of9 {
+    top: 330px;
+    left: 25px;
+    
+    .bet {
+      top: 100px;
+      right: -160px;
+    }
+  }
+
+  .seat7of9 {
     top: 135px;
     left: 15px;
         
@@ -251,16 +261,7 @@
       top: 160px;
       right: -150px;
     }
-  }
-
-  .seat7of9 {
-    top: 25px;
-    left: 415px;
-
-    .bet {
-      top: 170px;
-      right: -50px;
-    }
+    
   }
 
   .seat8of9 {
@@ -274,12 +275,12 @@
   }
 
   .seat9of9 {
-    top: 330px;
-    left: 25px;
-    
+    top: 25px;
+    left: 415px;
+
     .bet {
-      top: 100px;
-      right: -160px;
+      top: 170px;
+      right: -50px;
     }
   }
 

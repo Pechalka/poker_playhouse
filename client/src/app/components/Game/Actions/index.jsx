@@ -96,9 +96,6 @@ class Actions extends React.Component {
       ['All in', seat.bet + seat.stack]
     ]
 
-    console.log('table ', table);
-    console.log('seat ', seat);
-
     return (
       <div style={styles.container}>
         <ActionButtons
