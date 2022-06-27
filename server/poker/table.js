@@ -570,6 +570,10 @@ class Table {
       message: `${seat.player.name} raises to $${amount.toFixed(2)}`
     }
   }
+
+  canJoin(){
+    return this.players.length < 2
+  }
 }
 
 module.exports = Table

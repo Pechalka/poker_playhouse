@@ -3,14 +3,17 @@ const sequelize = require('sequelize')
 const db = require('../db/models')
 const Player = require('../poker/player.js')
 const Table = require('../poker/table.js')
+const TableBroker = require('../poker/TableBroker.js')
 
+
+const tableBroker = new TableBroker()
 const tables = {}
 const players = {}
 const timeouts = {}
 
 const INTERVAL_TO_INCREASE_BLIND = 60
 
-tables[1] = new Table(1, 'Table 1', 9, 10, 'free')
+tables[1] = new Table(1, 'Table 1', 2, 10, 'free')
 tables[2] = new Table(2, 'Table 2', 6, 10, 'free')
 tables[3] = new Table(3, 'Table 3', 6, 20, 'free')
 tables[4] = new Table(4, 'Table 4', 6, 20, 'playToEarn')
@@ -45,10 +48,17 @@ module.exports = {
       socket.emit('table_joined', { tables, tableId })
     })
 
+    function getCountOfNewEntites(){
+      const HOW_MUCH_PLAYERS_WILL_ADD = 1
+      const SIT_N_GO_PLAYERS_COUNT_REQUIREMENT = 9
+      const countOfPlayersInQueue = Object.keys(tables).length+HOW_MUCH_PLAYERS_WILL_ADD
+      return Math.floor(countOfPlayersInQueue/SIT_N_GO_PLAYERS_COUNT_REQUIREMENT)
+  }
+
     function needToReconnect(accountId, socketId){
       let player = null
-      for(const tableIndex in tables){
-        for(playerOnCheckIndex in tables[tableIndex].players){
+      for(const tableIndex in tableBroker.activeTables.tables){
+        for(playerOnCheckIndex in tableBroker.activeTables.tables[tableIndex].players){
           const playerOnCheck = tables[tableIndex].players[playerOnCheckIndex]
           if(playerOnCheck.accountId === accountId){
             // set state on new socket
@@ -65,7 +75,7 @@ module.exports = {
     }
 
     socket.on('sitAndPlayStart', async (accountId) => {
-      const tableId = 1;
+      //const tableId = 1;
       const playerInGame = needToReconnect(accountId, socket.id)
       if(playerInGame){
         socket.emit('table_joined', { tables, tableId })
@@ -102,37 +112,42 @@ module.exports = {
 
       socket.emit('account_update', account);
 
-      const table = tables[tableId]
+      const {tableId, seatId} = tableBroker.addPlayer(player)
 
-      table.addPlayer(player)
+      const table = tableBroker.activeTables.getTable(tableId);
 
-      const amount = 150;
-      let seatId = -1;
+      //const table = tables[tableId]
 
-      for(let key in table.seats) {
-        if (!table.seats[key]) {
-          seatId = +key;
-          break;
-        }
-      }
+      //table.addPlayer(player)
 
+
+      // const amount = 150;
+      // let seatId = -1;
+
+      // for(let key in table.seats) {
+      //   if (!table.seats[key]) {
+      //     seatId = +key;
+      //     break;
+      //   }
+      // }
+
+      //socket.broadcast.emit('tables_updated', tables)
+      
       socket.broadcast.emit('tables_updated', tables)
-      
-      socket.emit('table_joined', { tables, tableId })
 
+      //socket.emit('table_joined', { tables, tableId })
 
-      table.sitPlayer(player, seatId, amount)
+      socket.emit('table_joined', { tables:[table ? table : tableBroker.tableDraft], tableId })
+
+      // table.sitPlayer(player, seatId, amount)
       let message = `${player.name} sat down in Seat ${seatId}`
-      
-      // updatePlayerBankroll(player, -(amount))
         
-      player.bankroll = amount
+      // player.bankroll = amount
 
-      broadcastToTable(table, message)
-
-      socket.broadcast.emit('players_updated', players)
-
-      if (table.activePlayers().length === Object.keys(table.seats).length) {
+      if(table){
+        broadcastToTable(table, message)
+        socket.broadcast.emit('players_updated', table.players)
+        
         //need for calc when increase blind
         table.tournamentStart = new Date();
         
@@ -143,6 +158,21 @@ module.exports = {
           io.to(socketId).emit('game_start')
         }
       }
+      //broadcastToTable(table, message)
+
+      //socket.broadcast.emit('players_updated', players)
+
+      // if (table.activePlayers().length === Object.keys(table.seats).length) {
+      //   //need for calc when increase blind
+      //   table.tournamentStart = new Date();
+        
+      //   initNewHand(table)
+
+      //   for (let i = 0; i < table.players.length; i++) {
+      //     let socketId = table.players[i].socketId
+      //     io.to(socketId).emit('game_start')
+      //   }
+      // }
 
     })
 
